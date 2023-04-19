@@ -1,0 +1,106 @@
+[user]
+    name = Yuhau Lin
+    email = lyuhau@gmail.com
+[core]
+    excludesfile = ~/.gitignore
+[alias]
+    alias = !git config -l | grep alias | cut -c 7-
+
+    cl = clone
+
+    co = checkout
+    cob = checkout -b
+    brd = "!f() { git branch -d $1; git push -d origin $1; }; f"
+
+    s = status
+    ss = status -s
+
+    c = commit
+    cm = commit -m
+    cam = !git add -A && git cm
+    cf = commit --fixup
+    caf = !git add -A && git cf
+    cfs = "!f() { if [[ $1 =~ '^[0-9]+$' ]]; then rev=HEAD~$1; else rev=$1; fi; rev=\"$(git rev-parse $rev)\"; git cf $rev; git rbin $rev~; }; f"
+    cafs = "!f() { git add -A; git cfs \"$@\"; }; f"
+    cs = commit --squash
+    cas = !git add -A && git cs
+    ca = commit --amend -C HEAD
+    caa = !git add -A && git ca
+    reword = commit --amend -m
+
+    f = fetch
+    p = push
+    pf = push -f
+    pfa = push -f --all
+    pu = "!f() { branch=$(git rev-parse --abbrev-ref HEAD); git p -u origin $branch:${1-$branch}; }; f"
+    pfu = "!f() { branch=$(git rev-parse --abbrev-ref HEAD); git p -fu origin $branch:${1-$branch}; }; f"
+    fr = "!f() { git su; git f; git rebase ${1-$(git rev-parse --abbrev-ref develop@{upstream})}; git sp; }; f"
+
+    r = reset
+    r1 = reset HEAD^
+    cfd = clean -fd
+    rhc = "!f() { git reset --hard ${1-HEAD}; git cfd; }; f"
+    rhc1 = "!f() { git rhc HEAD~; }; f"
+    coh = "!f() { git rm -r --cached .; git cfd; git co $1 .; git r; }; f"
+
+    d = diff
+    dr = "!f() { git diff -w "$1"^.."$1"; }; f"
+    dc = diff --cached
+    dw = diff -w
+    dcw = diff --cached -w
+
+    l1 = log -1
+
+    ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+    ls = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(auto)%d'
+    lsa = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(auto)%d' --all
+    ll1 = !git ll -1
+    fl = log -u
+    fl1 = log -u -1
+    refl = reflog --format='%C(cyan)(%cr)%C(reset) %C(auto)%h %<|(17)%gd:%d %gs'
+
+    root = rev-parse --show-toplevel
+    find = !git ls-files | grep --color=always -Pie
+    grep = !git ls-files | grep --color=always -Prine
+
+    assume = "!f() { git ls-files $1 | xargs git update-index --assume-unchanged; }; f"
+    unassume = "!f() { git assumed $1 | xargs git update-index --no-assume-unchanged; }; f"
+    assumed = "!f() { git ls-files -v $1 | grep '^[hs]' | cut -c 3-; }; f"
+    unassumeall = "!f() { git unassume; }; f"
+    skip = "!f() { git ls-files $1 | xargs git update-index --skip-worktree; }; f"
+    unskip = "!f() { git skipped $1 | xargs git update-index --no-skip-worktree; }; f"
+    skipped = "!f() { git ls-files -v $1 | grep -i ^s | cut -c 3-; }; f"
+    unskipall = "!f() { git unskip; }; f"
+
+    su = stash -u
+    sp = stash pop
+    sa = stash apply
+    sd = stash drop
+    ss = stash show -p
+
+    rb = rebase
+    rbi = rebase -i
+    rbin = "!f() { GIT_SEQUENCE_EDITOR=: git rbi --autostash $1; }; f"
+    rbc = rebase --continue
+    rbcy = "!f() { GIT_EDITOR=true git rbc; }; f"
+    rba = rebase --abort
+    rbe = rebase --edit-todo
+
+    mt = mergetool
+
+    ours = "!f() { git co --ours $@ && git add $@; }; f"
+    theirs = "!f() { git co --theirs $@ && git add $@; }; f"
+
+    d-merged = "!f() { git branch -r --merged | cut -d/ -f2- | grep -vPie '^(?:HEAD|master|develop|release)' | if [[ "$1" == "--dry-run" ]]; then echo "Remote branches:"; cat; echo; else xargs git push -d origin; fi; git branch --merged | grep -vPie '^(?:\\* |HEAD|master|develop|release)' | if [[ "$1" == "--dry-run" ]]; then echo "Local branches:"; cat; echo; else xargs git branch -d; fi; }; f"
+
+    rem = "!git config -l | grep remote.*url | tail -n +2"
+
+    econf = config --edit --global
+    eig = "!f() { editor=$(git config --get core.editor); editor=${editor:-/root/scripts/outbash/npp}; file=/root/.gitignore; $editor $file; }; f"
+[push]
+    default = upstream
+[rebase]
+    autosquash = true
+[credential]
+    helper = store
+
